@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visualization Tool for Electric Vehicle Charge and Range Analysis</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="stylesheet.css" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#2563EB',
+            primaryDark: '#1E40AF',
+            primaryLight: '#DBEAFE',
+            secondary: '#10B981',
+            accent: '#0EA5E9',
+            dark: '#0F172A',
+            darkAlt: '#1E293B',
+            muted: '#64748B',
+            light: '#F8FAFC',
+            card: '#FFFFFF',
+            border: '#E2E8F0'
+          },
+          fontFamily: {
+            display: ['Space Grotesk', 'sans-serif'],
+            body: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-light">
+
+  <!-- ===================== START PAGE (SPLASH) ===================== -->
+  <div id="start-page">
+    <div class="start-bg-shape w-96 h-96 bg-primary top-0 left-0"></div>
+    <div class="start-bg-shape w-80 h-80 bg-secondary bottom-10 right-10"></div>
+    
+    <div class="start-content">
+      <div class="start-logo">
+        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+      <h4 class="font-display text-sm uppercase tracking-widest text-primary mb-4 font-bold">E-CarStart Presents</h4>
+      <h1 class="font-display text-4xl md:text-6xl font-bold text-dark mb-6 leading-tight px-4">
+        Visualization Tool for<br/>
+        <span class="text-primary">Electric Vehicle</span> Analysis
+      </h1>
+      <p class="text-slate-500 max-w-md mx-auto mb-10 px-4 text-lg">
+        Advanced analytics platform for monitoring charging infrastructure and optimizing vehicle range efficiency.
+      </p>
+      <button id="enter-btn" class="btn-primary px-10 py-4 rounded-full font-semibold text-lg inline-flex items-center gap-3 shadow-lg">
+        Enter Dashboard
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN APPLICATION ===================== -->
+  <div id="main-content">
+    
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-border" id="navbar">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-18 py-3">
+          <!-- Logo -->
+          <a href="#home" class="flex items-center gap-2 group">
+            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center transition-transform group-hover:scale-110">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+            <span class="font-display font-bold text-xl text-dark">E-CarStart</span>
+          </a>
+
+          <!-- Desktop Navigation -->
+          <div class="hidden md:flex items-center gap-6">
+            <a href="#home" class="nav-link font-medium text-dark active">Home</a>
+            <a href="#about" class="nav-link font-medium text-muted">About</a>
+            <a href="#team" class="nav-link font-medium text-muted">Team</a>
+            <a href="#dashboard" class="nav-link font-medium text-muted">Dashboard</a>
+            <a href="#story" class="nav-link font-medium text-muted">Story</a>
+            <a href="#contact" class="nav-link font-medium text-muted">Contact</a>
+          </div>
+
+          <!-- CTA Button -->
+          <div class="hidden md:block">
+            <a href="#dashboard" class="btn-primary px-5 py-2 rounded-full font-semibold text-sm inline-flex items-center gap-2">
+              Get Started
+            </a>
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors" id="mobileMenuBtn" aria-label="Toggle menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div class="mobile-menu fixed inset-y-0 right-0 w-72 bg-white shadow-2xl md:hidden" id="mobileMenu">
+        <div class="p-6">
+          <button class="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg" id="closeMenuBtn" aria-label="Close menu">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+          <nav class="mt-12 flex flex-col gap-4">
+            <a href="#home" class="mobile-nav-link py-3 px-4 rounded-lg hover:bg-primary/10 font-medium text-dark transition-colors">Home</a>
+            <a href="#about" class="mobile-nav-link py-3 px-4 rounded-lg hover:bg-primary/10 font-medium text-muted transition-colors">About</a>
+            <a href="#team" class="mobile-nav-link py-3 px-4 rounded-lg hover:bg-primary/10 font-medium text-muted transition-colors">Team</a>
+            <a href="#dashboard" class="mobile-nav-link py-3 px-4 rounded-lg hover:bg-primary/10 font-medium text-muted transition-colors">Dashboard</a>
+            <a href="#story" class="mobile-nav-link py-3 px-4 rounded-lg hover:bg-primary/10 font-medium text-muted transition-colors">Story</a>
+            <a href="#contact" class="mobile-nav-link py-3 px-4 rounded-lg hover:bg-primary/10 font-medium text-muted transition-colors">Contact</a>
+          </nav>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient min-h-screen pt-24 pb-16 lg:pt-32 lg:pb-24 overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <!-- Left Content -->
+          <div class="section-hidden" data-animate>
+            <span class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6 animate-fade-up">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+              </svg>
+              Advanced EV Analytics
+            </span>
+            <h1 class="font-display text-4xl sm:text-5xl lg:text-5xl font-bold text-dark leading-tight mb-6 animate-fade-up delay-100">
+              Visualization Tool for Electric Vehicle <span class="text-primary">Charge and Range Analysis</span>
+            </h1>
+            <p class="text-lg text-muted mb-8 max-w-lg animate-fade-up delay-200">
+              Unlock critical insights into charging infrastructure and vehicle range efficiency. Empowering decisions with real-time data analytics.
+            </p>
+            <div class="flex flex-wrap gap-4 animate-fade-up delay-300">
+              <a href="#dashboard" class="btn-primary px-8 py-3 rounded-full font-semibold inline-flex items-center gap-3">
+                View Dashboard
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </a>
+              <a href="#about" class="px-8 py-3 rounded-full font-semibold border-2 border-dark text-dark hover:bg-dark hover:text-white transition-all inline-flex items-center gap-2">
+                Learn More
+              </a>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-6 mt-12 animate-fade-up delay-400">
+              <div class="text-center">
+                <div class="font-display text-3xl font-bold text-dark counter" data-target="350">0</div>
+                <div class="text-sm text-muted">Mile Range</div>
+              </div>
+              <div class="text-center">
+                <div class="font-display text-3xl font-bold text-primary counter" data-target="15">0</div>
+                <div class="text-sm text-muted">Min Fast Charge</div>
+              </div>
+              <div class="text-center">
+                <div class="font-display text-3xl font-bold text-secondary counter" data-target="98">0</div>
+                <div class="text-sm text-muted">% Efficiency</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Illustration -->
+          <div class="illustration-container relative animate-slide-right">
+            <div class="relative z-10">
+              <div class="bg-white rounded-3xl p-6 shadow-2xl transform hover:scale-[1.02] transition-transform duration-500">
+                <!-- Blue Themed Car Illustration -->
+                <svg viewBox="0 0 400 300" class="w-full h-auto">
+                  <circle cx="320" cy="60" r="40" fill="#DBEAFE" opacity="0.6"/>
+                  <circle cx="80" cy="240" r="30" fill="#D1FAE5" opacity="0.6"/>
+                  <g transform="translate(30, 50)">
+                    <rect x="8" y="30" width="4" height="60" fill="#94A3B8"/>
+                    <circle cx="10" cy="30" r="4" fill="#64748B"/>
+                    <path d="M10 30 L10 5 L20 25 Z" fill="#CBD5E1" class="charging-bolt"/>
+                    <path d="M10 30 L-8 45 L5 35 Z" fill="#CBD5E1" class="charging-bolt"/>
+                  </g>
+                  <g transform="translate(320, 120)">
+                    <rect x="0" y="0" width="40" height="80" rx="4" fill="#334155"/>
+                    <rect x="5" y="10" width="30" height="20" rx="2" fill="#1E293B"/>
+                    <circle cx="20" cy="40" r="8" fill="#10B981"/>
+                    <path d="M18 37 L22 37 L20 43 L24 43 L16 50 L18 45 L14 45 Z" fill="white" class="charging-bolt"/>
+                    <rect x="15" y="60" width="10" height="30" fill="#475569"/>
+                  </g>
+                  <g transform="translate(100, 140)">
+                    <path d="M20 60 L40 30 L140 30 L180 60 L200 60 L200 90 L180 100 L40 100 L20 90 Z" fill="#2563EB"/>
+                    <path d="M40 30 L60 10 L130 10 L140 30 Z" fill="#1E40AF"/>
+                    <path d="M50 28 L65 12 L125 12 L135 28 Z" fill="#BFDBFE"/>
+                    <circle cx="60" cy="100" r="25" fill="#1E293B"/>
+                    <circle cx="60" cy="100" r="15" fill="#64748B"/>
+                    <circle cx="160" cy="100" r="25" fill="#1E293B"/>
+                    <circle cx="160" cy="100" r="15" fill="#64748B"/>
+                    <rect x="85" y="65" width="30" height="15" rx="3" fill="white"/>
+                    <text x="100" y="76" text-anchor="middle" font-size="10" font-weight="bold" fill="#2563EB">EV</text>
+                  </g>
+                  <g transform="translate(150, 30)">
+                    <circle cx="50" cy="50" r="40" stroke="#E2E8F0" stroke-width="8" fill="none"/>
+                    <circle cx="50" cy="50" r="40" stroke="#2563EB" stroke-width="8" fill="none" stroke-dasharray="220 251" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                    <text x="50" y="55" text-anchor="middle" font-size="16" font-weight="bold" fill="#2563EB">85%</text>
+                  </g>
+                </svg>
+              </div>
+              <div class="absolute -top-4 -right-4 bg-white rounded-2xl p-4 shadow-lg animate-float">
+                <div class="flex items-center gap-2">
+                  <div class="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
+                    <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+                  </div>
+                  <div><div class="text-xs text-muted">Range</div><div class="font-display font-bold text-secondary">Optimal</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 lg:py-32 section-gradient">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-16 items-center mb-20">
+            <div class="section-hidden" data-animate>
+                <span class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">About The Project</span>
+                <h2 class="font-display text-3xl sm:text-4xl font-bold text-dark mb-6">
+                    Optimizing the Future of <span class="text-secondary">Mobility</span>
+                </h2>
+                <p class="text-muted text-lg mb-6">
+                    Our tool provides granular insights into efficiency metrics across different terrains and conditions, helping stakeholders optimize battery performance. We leverage advanced data modeling to present actionable intelligence for the EV ecosystem.
+                </p>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-dark">Real-time Data Processing</h4>
+                            <p class="text-sm text-muted">Instant analysis of charging patterns and energy consumption.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 bg-secondary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="font-semibold text-dark">Predictive Maintenance</h4>
+                            <p class="text-sm text-muted">Forecasting battery health and maintenance schedules.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-6 section-hidden" data-animate>
+                <div class="feature-card p-6 text-center">
+                    <div class="text-4xl font-bold text-primary mb-2">150+</div>
+                    <div class="text-sm text-muted">Data Points Analyzed</div>
+                </div>
+                <div class="feature-card p-6 text-center">
+                    <div class="text-4xl font-bold text-secondary mb-2">99.9%</div>
+                    <div class="text-sm text-muted">Prediction Accuracy</div>
+                </div>
+                <div class="feature-card p-6 text-center col-span-2 bg-dark text-white">
+                    <div class="text-lg font-semibold mb-1">Our Mission</div>
+                    <p class="text-sm text-slate-300">To accelerate the adoption of electric vehicles through transparent and accessible data analytics.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="feature-card p-8 text-center section-hidden" data-animate>
+            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-xl text-dark mb-2">Charge Analysis</h3>
+            <p class="text-sm text-muted">Real-time monitoring of charging speeds and infrastructure availability.</p>
+          </div>
+          <div class="feature-card p-8 text-center section-hidden" data-animate style="animation-delay: 0.1s;">
+            <div class="w-16 h-16 bg-secondary/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-xl text-dark mb-2">Range Prediction</h3>
+            <p class="text-sm text-muted">Predictive models for vehicle range based on driving habits and weather.</p>
+          </div>
+          <div class="feature-card p-8 text-center section-hidden" data-animate style="animation-delay: 0.2s;">
+            <div class="w-16 h-16 bg-accent/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-xl text-dark mb-2">Data Insights</h3>
+            <p class="text-sm text-muted">Comprehensive visualization dashboards for in-depth analysis.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section -->
+    <section id="team" class="py-20 lg:py-32 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16 section-hidden" data-animate>
+          <span class="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary rounded-full text-sm font-medium mb-4">Our Team</span>
+          <h2 class="font-display text-3xl sm:text-4xl font-bold text-dark">
+            Meet The <span class="text-primary">Team</span>
+          </h2>
+          <p class="text-muted max-w-2xl mx-auto mt-4">
+            A dedicated team of MCA students building the future of EV analytics.
+          </p>
+        </div>
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            
+          <!-- Team Member 1: Samruddhi -->
+          <div class="feature-card p-6 text-center section-hidden" data-animate>
+            <div class="team-img-placeholder w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+               <svg class="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-dark">Samruddhi Yadav</h3>
+            <p class="text-sm text-muted mt-1">MCA Student</p>
+          </div>
+          
+          <!-- Team Member 2: Shraddha (Highlighted) -->
+          <div class="feature-card highlight-card p-6 text-center section-hidden" data-animate style="animation-delay: 0.1s;">
+            <div class="team-img-placeholder w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden ring-4 ring-primary/30 bg-white">
+               <svg class="w-12 h-12 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-dark">Shraddha Mali</h3>
+            <p class="text-sm text-primary font-medium mt-1">MCA Student</p>
+          </div>
+
+          <!-- Team Member 3: Rakshita -->
+          <div class="feature-card p-6 text-center section-hidden" data-animate style="animation-delay: 0.2s;">
+            <div class="team-img-placeholder w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+               <svg class="w-12 h-12 text-accent" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-dark">Rakshita Amange</h3>
+            <p class="text-sm text-muted mt-1">MCA Student</p>
+          </div>
+
+          <!-- Team Member 4: Anuradha -->
+          <div class="feature-card p-6 text-center section-hidden" data-animate style="animation-delay: 0.3s;">
+            <div class="team-img-placeholder w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden">
+               <svg class="w-12 h-12 text-dark" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <h3 class="font-display font-semibold text-lg text-dark">Anuradha Asule</h3>
+            <p class="text-sm text-muted mt-1">MCA Student</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="py-20 lg:py-32 section-gradient">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12 section-hidden" data-animate>
+          <span class="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium mb-6">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            Analytics View
+          </span>
+          <h2 class="font-display text-3xl sm:text-4xl font-bold text-dark mb-4">
+            Electric Cars <span class="text-secondary">Analytics Dashboard</span>
+          </h2>
+          <p class="text-lg text-muted max-w-2xl mx-auto">
+            Interactive visualization of EV market data.
+          </p>
+        </div>
+
+        <div class="section-hidden" data-animate>
+            <div class="flex justify-end items-center mb-4">
+                <a href="https://public.tableau.com/views/ElectricCarsAnalyticsDashboard_17728587954940/Dashboard3?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" target="_blank" class="text-sm text-primary hover:underline flex items-center gap-1">
+                    View Full Screen
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                </a>
+            </div>
+            <div class="tableau-container">
+                <div class='tableauPlaceholder' id='viz1772861989921' style='position: relative'>
+                    <noscript>
+                        <a href='#'>
+                            <img alt='Dashboard 3 ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;El&#47;ElectricCarsAnalyticsDashboard_17728587954940&#47;Dashboard3&#47;1_rss.png' style='border: none' />
+                        </a>
+                    </noscript>
+                    <object class='tableauViz' style='display:none;'>
+                        <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                        <param name='embed_code_version' value='3' />
+                        <param name='site_root' value='' />
+                        <param name='name' value='ElectricCarsAnalyticsDashboard_17728587954940&#47;Dashboard3' />
+                        <param name='tabs' value='no' />
+                        <param name='toolbar' value='yes' />
+                        <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;El&#47;ElectricCarsAnalyticsDashboard_17728587954940&#47;Dashboard3&#47;1.png' />
+                        <param name='animate_transition' value='yes' />
+                        <param name='display_static_image' value='yes' />
+                        <param name='display_spinner' value='yes' />
+                        <param name='display_overlay' value='yes' />
+                        <param name='display_count' value='yes' />
+                        <param name='language' value='en-US' />
+                    </object>
+                </div>
+                <!-- FIXED SCRIPT FOR RESPONSIVE DASHBOARD -->
+                <script type='text/javascript'>
+                    var divElement = document.getElementById('viz1772861989921');
+                    var vizElement = divElement.getElementsByTagName('object')[0];
+                    
+                    // Set width to 100% to fit the container properly (Horizontal Fix)
+                    vizElement.style.width = '100%';
+                    
+                    // Set height to the dashboard's designed height (Vertical Fix)
+                    // If the content looks too tall, this is the actual height of your dashboard on Tableau Public.
+                    vizElement.style.height = '2927px'; 
+                    
+                    var scriptElement = document.createElement('script');
+                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+                    vizElement.parentNode.insertBefore(scriptElement, vizElement);
+                </script>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Story Section -->
+    <section id="story" class="py-20 lg:py-32 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12 section-hidden" data-animate>
+                <span class="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 text-secondary rounded-full text-sm font-medium mb-6">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Narrative Visualization
+                </span>
+                <h2 class="font-display text-3xl sm:text-4xl font-bold text-dark mb-4">
+                    Story of Electric Cars <span class="text-primary">in India</span>
+                </h2>
+                <p class="text-lg text-muted max-w-2xl mx-auto">
+                    Explore the narrative and growth of the EV market through this interactive story.
+                </p>
+            </div>
+    
+            <div class="section-hidden" data-animate>
+                <div class="flex justify-end items-center mb-4">
+                    <a href="https://public.tableau.com/views/StoryofElectricCarsinindia/StoryofElectriccarsinindia?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link" target="_blank" class="text-sm text-primary hover:underline flex items-center gap-1">
+                        View Full Screen
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+                </div>
+                <div class="tableau-container">
+                    <div class='tableauPlaceholder' id='viz1772858910502' style='position: relative'>
+                        <noscript>
+                            <a href='#'><img alt='Story of Electric cars in india ' src='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;St&#47;StoryofElectricCarsinindia&#47;StoryofElectriccarsinindia&#47;1_rss.png' style='border: none' /></a>
+                        </noscript>
+                        <object class='tableauViz' style='display:none;'>
+                            <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' />
+                            <param name='embed_code_version' value='3' />
+                            <param name='site_root' value='' />
+                            <param name='name' value='StoryofElectricCarsinindia&#47;StoryofElectriccarsinindia' />
+                            <param name='tabs' value='no' />
+                            <param name='toolbar' value='yes' />
+                            <param name='static_image' value='https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;St&#47;StoryofElectricCarsinindia&#47;StoryofElectriccarsinindia&#47;1.png' />
+                            <param name='animate_transition' value='yes' />
+                            <param name='display_static_image' value='yes' />
+                            <param name='display_spinner' value='yes' />
+                            <param name='display_overlay' value='yes' />
+                            <param name='display_count' value='yes' />
+                            <param name='language' value='en-US' />
+                        </object>
+                    </div>
+                    <script type='text/javascript'>
+                        var divElement = document.getElementById('viz1772858910502');
+                        var vizElement = divElement.getElementsByTagName('object')[0];
+                        vizElement.style.width = '100%';
+                        vizElement.style.height = '891px';
+                        var scriptElement = document.createElement('script');
+                        scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+                        vizElement.parentNode.insertBefore(scriptElement, vizElement);
+                    </script>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 lg:py-32 section-gradient">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="font-display text-3xl sm:text-4xl font-bold text-dark">
+                Get In <span class="text-primary">Touch</span>
+            </h2>
+            <p class="text-muted max-w-xl mx-auto mt-4">
+                Have questions or feedback? We'd love to hear from you. Reach out via the form or our social channels.
+            </p>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-12 items-start">
+            <!-- Contact Info & Socials -->
+            <div class="lg:col-span-1 space-y-8 section-hidden" data-animate>
+                <div class="flex items-start gap-4 p-6 bg-white rounded-xl shadow-sm">
+                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-dark mb-1">Email Us</h3>
+                        <p class="text-muted text-sm">shraddhamali04@gmail.com</p>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-white rounded-xl shadow-sm">
+                    <h3 class="font-semibold text-dark mb-4">Connect With Us</h3>
+                    <div class="flex gap-4">
+                        <!-- LinkedIn -->
+                        <a href="https://www.linkedin.com/in/shraddha-mali-8a5573304/?utm_source=share_via&utm_content=profile&utm_medium=member_android" target="_blank" class="social-icon-btn w-12 h-12 bg-light rounded-xl shadow-sm flex items-center justify-center hover:bg-blue-50">
+                            <svg class="w-5 h-5 text-[#0077b5]" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                        </a>
+                        <!-- GitHub -->
+                        <a href="https://github.com/shraddhamali04-tech" target="_blank" class="social-icon-btn w-12 h-12 bg-light rounded-xl shadow-sm flex items-center justify-center hover:bg-gray-100">
+                            <svg class="w-5 h-5 text-dark" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="lg:col-span-2 section-hidden" data-animate>
+              <form action="mailto:shraddhamali04@gmail.com" method="POST" enctype="text/plain">
+                <div class="feature-card p-8">
+                  <div class="grid sm:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label class="block text-sm font-medium text-muted mb-2">First Name</label>
+                      <input type="text" name="FirstName" class="w-full px-4 py-3 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Enter First Namse" required>
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-muted mb-2">Last Name</label>
+                      <input type="text" name="LastName" class="w-full px-4 py-3 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Enter Last Name" required>
+                    </div>
+                  </div>
+                  <div class="mb-6">
+                    <label class="block text-sm font-medium text-muted mb-2">Email Address</label>
+                    <input type="email" name="Email" class="w-full px-4 py-3 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:outline-none" placeholder="abc@example.com" required>
+                  </div>
+                  <div class="mb-6">
+                    <label class="block text-sm font-medium text-muted mb-2">Subject</label>
+                    <select name="Subject" class="w-full px-4 py-3 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:outline-none bg-white">
+                        <option>General Inquiry</option>
+                        <option>Data Request</option>
+                        <option>Partnership</option>
+                    </select>
+                  </div>
+                  <div class="mb-6">
+                    <label class="block text-sm font-medium text-muted mb-2">Message</label>
+                    <textarea rows="4" name="Message" class="w-full px-4 py-3 rounded-lg border border-border focus:ring-2 focus:ring-primary focus:outline-none resize-none" placeholder="Your message..." required></textarea>
+                  </div>
+                  <button type="submit" class="btn-primary w-full py-3 rounded-lg font-semibold">
+                    Send Message
+                  </button>
+                </div>
+              </form>
+            </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-darkAlt text-white pt-16 pb-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 mb-12">
+                <div class="md:col-span-2">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        </div>
+                        <span class="font-display font-bold text-lg">E-CarStart</span>
+                    </div>
+                    <p class="text-slate-400 text-sm max-w-sm">
+                        Visualization Tool for Electric Vehicle Charge and Range Analysis. Empowering the future of mobility through data.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-white">Quick Links</h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="#about" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#dashboard" class="hover:text-white transition-colors">Dashboard</a></li>
+                        <li><a href="#story" class="hover:text-white transition-colors">Story</a></li>
+                        <li><a href="#team" class="hover:text-white transition-colors">Our Team</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-white">Resources</h4>
+                    <ul class="space-y-2 text-sm text-slate-400">
+                        <li><a href="https://public.tableau.com/views/ElectricCarsAnalyticsDashboard_17728587954940/Dashboard3" target="_blank" class="hover:text-white transition-colors">EV Dashboard</a></li>
+                        <li><a href="https://public.tableau.com/views/StoryofElectricCarsinindia/StoryofElectriccarsinindia" target="_blank" class="hover:text-white transition-colors">EV Story</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-slate-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-slate-500 text-xs">
+                    &copy; 2024 E-CarStart. All rights reserved.
+                </p>
+                <div class="flex gap-4">
+                    <a href="https://www.linkedin.com/in/shraddha-mali-8a5573304/" target="_blank" class="text-slate-400 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+                    <a href="https://github.com/shraddhamali04-tech" target="_blank" class="text-slate-400 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const startPage = document.getElementById('start-page');
+      const mainContent = document.getElementById('main-content');
+      const enterBtn = document.getElementById('enter-btn');
+
+      // Splash Screen Logic
+      enterBtn.addEventListener('click', function() {
+        startPage.classList.add('hidden');
+        mainContent.style.display = 'block';
+        document.querySelectorAll('#main-content [data-animate]').forEach(el => {
+            observer.observe(el);
+        });
+      });
+
+      // Navigation Logic
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const closeMenuBtn = document.getElementById('closeMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+
+      function openMobileMenu() {
+        mobileMenu.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeMobileMenu() {
+        mobileMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      mobileMenuBtn.addEventListener('click', openMobileMenu);
+      closeMenuBtn.addEventListener('click', closeMobileMenu);
+      mobileNavLinks.forEach(link => link.addEventListener('click', closeMobileMenu));
+
+      // Scroll Progress
+      const scrollIndicator = document.getElementById('scrollIndicator');
+      window.addEventListener('scroll', function() {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        scrollIndicator.style.width = scrollPercent + '%';
+      });
+
+      // Active Nav Link
+      const sections = document.querySelectorAll('section[id]');
+      const navLinks = document.querySelectorAll('.nav-link');
+
+      window.addEventListener('scroll', function() {
+        const scrollY = window.scrollY + 100;
+        sections.forEach(section => {
+          const sectionTop = section.offsetTop;
+          const sectionHeight = section.offsetHeight;
+          const sectionId = section.getAttribute('id');
+          
+          if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+            navLinks.forEach(link => {
+              link.classList.remove('active');
+              if (link.getAttribute('href') === '#' + sectionId) {
+                link.classList.add('active');
+              }
+            });
+          }
+        });
+      });
+
+      // Intersection Observer
+      const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.remove('section-hidden');
+            entry.target.classList.add('section-visible');
+          }
+        });
+      }, observerOptions);
+
+      // Counter Animation
+      const counters = document.querySelectorAll('.counter');
+      const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const target = parseInt(entry.target.getAttribute('data-target')) || 0;
+            const duration = 2000;
+            const startTime = performance.now();
+            
+            function updateCounter(currentTime) {
+              const elapsed = currentTime - startTime;
+              const progress = Math.min(elapsed / duration, 1);
+              const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+              const current = Math.floor(easeOutQuart * target);
+              entry.target.textContent = current + (target > 100 ? '+' : target > 10 ? '+' : '+');
+              if (progress < 1) requestAnimationFrame(updateCounter);
+            }
+            requestAnimationFrame(updateCounter);
+            counterObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+
+      counters.forEach(counter => counterObserver.observe(counter));
+
+      // Smooth Scroll
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+      
+      // Navbar Shadow
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) navbar.classList.add('shadow-lg');
+        else navbar.classList.remove('shadow-lg');
+      });
+    });
+  </script>
+</body>
+</html>
